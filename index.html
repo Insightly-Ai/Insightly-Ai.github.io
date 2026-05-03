@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Insightly AI — Jouw persoonlijke GA4-analist</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --purple-50: #EEEDFE; --purple-100: #CECBF6; --purple-200: #AFA9EC;
+    --purple-400: #7F77DD; --purple-600: #534AB7; --purple-800: #3C3489; --purple-900: #26215C;
+    --teal-400: #1D9E75; --teal-100: #9FE1CB; --teal-50: #E1F5EE;
+    --coral-400: #D85A30; --coral-100: #F5C4B3; --coral-50: #FAECE7;
+    --amber-400: #BA7517; --amber-100: #FAC775;
+    --gray-50: #F1EFE8; --gray-100: #D3D1C7; --gray-600: #5F5E5A; --gray-900: #2C2C2A;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f8f7ff;
+    color: var(--gray-900);
+    line-height: 1.6;
+  }
+
+  /* NAV */
+  nav {
+    background: white;
+    border-bottom: 1px solid var(--purple-100);
+    padding: 0 40px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; color: var(--purple-800); text-decoration: none; }
+  .logo-icon { width: 36px; height: 36px; background: var(--purple-600); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .nav-links { display: flex; gap: 32px; align-items: center; }
+  .nav-links a { text-decoration: none; color: var(--gray-600); font-size: 14px; transition: color .2s; }
+  .nav-links a:hover { color: var(--purple-600); }
+  .nav-cta { background: var(--purple-600); color: white !important; padding: 8px 20px; border-radius: 8px; font-weight: 500; }
+  .nav-cta:hover { background: var(--purple-800) !important; color: white !important; }
+
+  /* HERO */
+  .hero {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 80px 40px 60px;
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    gap: 60px;
+    align-items: center;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--purple-50);
+    color: var(--purple-600);
+    border: 1px solid var(--purple-100);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-size: 52px;
+    font-weight: 800;
+    line-height: 1.15;
+    color: var(--purple-900);
+    margin-bottom: 20px;
+  }
+  .hero h1 span { color: var(--purple-600); }
+  .hero p {
+    font-size: 18px;
+    color: var(--gray-600);
+    margin-bottom: 36px;
+    max-width: 480px;
+  }
+  .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--purple-600);
+    color: white;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all .2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-primary:hover { background: var(--purple-800); transform: translateY(-1px); }
+  .btn-secondary {
+    background: white;
+    color: var(--purple-600);
+    border: 1.5px solid var(--purple-200);
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all .2s;
+  }
+  .btn-secondary:hover { border-color: var(--purple-400); background: var(--purple-50); }
+  .hero-social-proof {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 28px;
+    font-size: 13px;
+    color: var(--gray-600);
+  }
+  .avatar-stack { display: flex; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid white; margin-left: -8px; background: var(--purple-400); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: white; }
+  .avatar:first-child { margin-left: 0; }
+  .stars { color: #FAC775; font-size: 14px; }
+
+  /* ROBOT CARD */
+  .hero-robot {
+    background: white;
+    border-radius: 24px;
+    border: 1px solid var(--purple-100);
+    padding: 32px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-robot::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--purple-600), var(--teal-400), var(--coral-400));
+  }
+  .robot-svg { width: 200px; height: 200px; }
+  .chat-bubble {
+    background: var(--purple-50);
+    border: 1px solid var(--purple-100);
+    border-radius: 16px 16px 16px 4px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--purple-800);
+    text-align: left;
+    margin-top: 16px;
+    line-height: 1.5;
+  }
+  .chat-bubble strong { color: var(--purple-600); }
+
+  /* STATS BAR */
+  .stats-bar {
+    background: var(--purple-900);
+    padding: 24px 40px;
+  }
+  .stats-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    text-align: center;
+  }
+  .stat-num { font-size: 32px; font-weight: 800; color: white; }
+  .stat-label { font-size: 13px; color: var(--purple-200); margin-top: 2px; }
+
+  /* HOE HET WERKT */
+  .section { max-width: 1100px; margin: 0 auto; padding: 80px 40px; }
+  .section-label { font-size: 13px; font-weight: 600; color: var(--purple-600); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 12px; }
+  .section h2 { font-size: 38px; font-weight: 800; color: var(--purple-900); margin-bottom: 16px; }
+  .section-sub { font-size: 17px; color: var(--gray-600); max-width: 560px; }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 56px;
+  }
+  .step {
+    background: white;
+    border: 1px solid var(--purple-100);
+    border-radius: 20px;
+    padding: 32px 28px;
+    position: relative;
+  }
+  .step-num {
+    width: 40px; height: 40px;
+    background: var(--purple-600);
+    color: white;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 16px;
+    margin-bottom: 20px;
+  }
+  .step h3 { font-size: 18px; font-weight: 700; color: var(--purple-900); margin-bottom: 10px; }
+  .step p { font-size: 14px; color: var(--gray-600); line-height: 1.6; }
+  .step-icon { font-size: 32px; margin-bottom: 16px; }
+
+  /* FEATURES */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-top: 56px;
+  }
+  .feature-card {
+    background: white;
+    border: 1px solid var(--purple-100);
+    border-radius: 20px;
+    padding: 28px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .feature-icon {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .feature-card h3 { font-size: 16px; font-weight: 700; color: var(--purple-900); margin-bottom: 6px; }
+  .feature-card p { font-size: 13px; color: var(--gray-600); line-height: 1.6; }
+
+  /* CHAT DEMO */
+  .chat-demo-section {
+    background: var(--purple-900);
+    padding: 80px 40px;
+  }
+  .chat-demo-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+  .chat-demo-text h2 { font-size: 38px; font-weight: 800; color: white; margin-bottom: 16px; }
+  .chat-demo-text p { font-size: 17px; color: var(--purple-200); margin-bottom: 32px; }
+  .chat-window {
+    background: #1a1640;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid var(--purple-800);
+  }
+  .chat-header {
+    background: var(--purple-800);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--purple-100);
+  }
+  .chat-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .chat-messages { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+  .msg-user {
+    background: var(--purple-600);
+    color: white;
+    padding: 10px 14px;
+    border-radius: 14px 14px 4px 14px;
+    font-size: 13px;
+    align-self: flex-end;
+    max-width: 80%;
+  }
+  .msg-bot {
+    background: #2a2660;
+    color: var(--purple-100);
+    padding: 12px 16px;
+    border-radius: 14px 14px 14px 4px;
+    font-size: 13px;
+    max-width: 90%;
+    line-height: 1.6;
+  }
+  .msg-bot strong { color: var(--teal-100); }
+  .msg-bot .metric { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .source-badge {
+    display: inline-block;
+    background: rgba(93,202,165,0.15);
+    color: var(--teal-100);
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    margin-top: 8px;
+  }
+
+  /* PRICING */
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 56px;
+  }
+  .pricing-card {
+    background: white;
+    border: 1px solid var(--purple-100);
+    border-radius: 20px;
+    padding: 32px 28px;
+    position: relative;
+  }
+  .pricing-card.featured {
+    border: 2px solid var(--purple-600);
+  }
+  .popular-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--purple-600);
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 16px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .plan-name { font-size: 14px; font-weight: 600; color: var(--gray-600); margin-bottom: 8px; }
+  .plan-price { font-size: 42px; font-weight: 800; color: var(--purple-900); }
+  .plan-price span { font-size: 16px; font-weight: 400; color: var(--gray-600); }
+  .plan-desc { font-size: 13px; color: var(--gray-600); margin: 12px 0 24px; }
+  .plan-features { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+  .plan-features li { font-size: 13px; color: var(--gray-900); display: flex; gap: 8px; align-items: flex-start; }
+  .check { color: var(--teal-400); font-weight: 700; flex-shrink: 0; }
+  .plan-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    transition: all .2s;
+    cursor: pointer;
+    border: none;
+  }
+  .plan-btn-outline { background: var(--purple-50); color: var(--purple-600); border: 1.5px solid var(--purple-200); }
+  .plan-btn-outline:hover { background: var(--purple-100); }
+  .plan-btn-fill { background: var(--purple-600); color: white; }
+  .plan-btn-fill:hover { background: var(--purple-800); }
+
+  /* TESTIMONIALS */
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 56px;
+  }
+  .testimonial {
+    background: white;
+    border: 1px solid var(--purple-100);
+    border-radius: 20px;
+    padding: 28px;
+  }
+  .testimonial-stars { color: var(--amber-400); font-size: 14px; margin-bottom: 14px; }
+  .testimonial p { font-size: 14px; color: var(--gray-600); line-height: 1.7; margin-bottom: 20px; font-style: italic; }
+  .testimonial-author { display: flex; align-items: center; gap: 10px; }
+  .author-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px;
+    color: white;
+    flex-shrink: 0;
+  }
+  .author-name { font-weight: 600; font-size: 13px; color: var(--purple-900); }
+  .author-role { font-size: 12px; color: var(--gray-600); }
+
+  /* CTA SECTIE */
+  .cta-section {
+    background: var(--purple-600);
+    padding: 80px 40px;
+    text-align: center;
+  }
+  .cta-inner { max-width: 640px; margin: 0 auto; }
+  .cta-section h2 { font-size: 40px; font-weight: 800; color: white; margin-bottom: 16px; }
+  .cta-section p { font-size: 17px; color: var(--purple-100); margin-bottom: 36px; }
+  .btn-white { background: white; color: var(--purple-600); padding: 16px 36px; border-radius: 12px; font-size: 17px; font-weight: 700; text-decoration: none; display: inline-block; transition: all .2s; }
+  .btn-white:hover { transform: translateY(-2px); background: var(--purple-50); }
+  .cta-note { font-size: 13px; color: var(--purple-200); margin-top: 16px; }
+
+  /* FOOTER */
+  footer {
+    background: var(--purple-900);
+    padding: 48px 40px 28px;
+    color: var(--purple-200);
+  }
+  .footer-inner { max-width: 1100px; margin: 0 auto; }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+  .footer-brand p { font-size: 13px; color: var(--purple-200); margin-top: 12px; max-width: 240px; line-height: 1.6; }
+  .footer h4 { font-size: 13px; font-weight: 600; color: white; margin-bottom: 16px; }
+  .footer ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .footer ul li a { font-size: 13px; color: var(--purple-200); text-decoration: none; }
+  .footer ul li a:hover { color: white; }
+  .footer-bottom { border-top: 1px solid var(--purple-800); padding-top: 20px; display: flex; justify-content: space-between; font-size: 12px; color: var(--purple-200); }
+
+  /* Inline robot */
+  .robot-inline { display: flex; justify-content: center; margin: 0 auto 8px; }
+
+  @media (max-width: 768px) {
+    .hero { grid-template-columns: 1fr; padding: 40px 20px; }
+    .hero-robot { display: none; }
+    .hero h1 { font-size: 36px; }
+    .steps, .features-grid, .pricing-grid, .testimonials-grid { grid-template-columns: 1fr; }
+    .stats-inner { grid-template-columns: repeat(2, 1fr); }
+    .chat-demo-inner { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="#">
+    <div class="logo-icon">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <rect x="2" y="12" width="4" height="8" rx="1.5" fill="#FAC775"/>
+        <rect x="8" y="8" width="4" height="12" rx="1.5" fill="#E24B4A"/>
+        <rect x="14" y="4" width="4" height="16" rx="1.5" fill="#5DCAA5"/>
+        <circle cx="4" cy="10" r="2" fill="white" opacity="0.9"/>
+      </svg>
+    </div>
+    Insightly AI
+  </a>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#pricing">Prijzen</a>
+    <a href="#how">Hoe het werkt</a>
+    <a href="https://insightly-ai.up.railway.app" class="nav-cta">Gratis proberen</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section>
+  <div class="hero">
+    <div>
+      <div class="hero-badge">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" fill="#534AB7"/><path d="M4 6l1.5 1.5L8 4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Geen GA4-kennis nodig
+      </div>
+      <h1>Jouw persoonlijke <span>GA4-analist</span> die nooit slaapt</h1>
+      <p>Stel een vraag in gewone taal en ontvang direct heldere inzichten. Gekoppeld aan GA4 én Google Search Console. Geen dashboards, geen handmatig exporteren.</p>
+      <div class="hero-actions">
+        <a href="https://insightly-ai.up.railway.app" class="btn-primary">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L14 8L8 14M2 8H14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Start gratis
+        </a>
+        <a href="#how" class="btn-secondary">Bekijk hoe het werkt</a>
+      </div>
+      <div class="hero-social-proof">
+        <div class="avatar-stack">
+          <div class="avatar" style="background:#534AB7">MK</div>
+          <div class="avatar" style="background:#1D9E75">JV</div>
+          <div class="avatar" style="background:#D85A30">RP</div>
+          <div class="avatar" style="background:#BA7517">SL</div>
+        </div>
+        <div>
+          <div class="stars">★★★★★</div>
+          <span>Gebruikt door 200+ marketeers</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-robot">
+      <!-- Kleine robot inline SVG -->
+      <div style="background:white;border-radius:24px;border:1px solid #CECBF6;padding:28px;text-align:center;position:relative;overflow:hidden;">
+        <div style="position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#534AB7,#1D9E75,#D85A30);"></div>
+        <svg width="160" height="180" viewBox="0 0 680 520" style="display:block;margin:0 auto 12px;">
+          <ellipse cx="340" cy="420" rx="140" ry="30" fill="#CECBF6" opacity="0.25"/>
+          <rect x="230" y="240" width="220" height="180" rx="40" fill="#534AB7"/>
+          <rect x="230" y="240" width="220" height="60" rx="40" fill="#7F77DD" opacity="0.4"/>
+          <rect x="258" y="265" width="164" height="100" rx="16" fill="#3C3489"/>
+          <rect x="278" y="330" width="18" height="24" rx="4" fill="#FAC775"/>
+          <rect x="304" y="318" width="18" height="36" rx="4" fill="#E24B4A"/>
+          <rect x="330" y="305" width="18" height="49" rx="4" fill="#5DCAA5"/>
+          <rect x="356" y="292" width="18" height="62" rx="4" fill="#534AB7"/>
+          <rect x="175" y="260" width="60" height="30" rx="15" fill="#534AB7"/>
+          <ellipse cx="168" cy="275" rx="22" ry="20" fill="#7F77DD"/>
+          <rect x="445" y="260" width="60" height="30" rx="15" fill="#534AB7"/>
+          <ellipse cx="525" cy="235" rx="22" ry="20" fill="#7F77DD"/>
+          <rect x="452" y="240" width="28" height="55" rx="14" fill="#534AB7" transform="rotate(-25 466 268)"/>
+          <rect x="275" y="408" width="55" height="70" rx="22" fill="#3C3489"/>
+          <rect x="350" y="408" width="55" height="70" rx="22" fill="#3C3489"/>
+          <ellipse cx="302" cy="478" rx="32" ry="14" fill="#26215C"/>
+          <ellipse cx="377" cy="478" rx="32" ry="14" fill="#26215C"/>
+          <rect x="315" y="215" width="50" height="32" rx="10" fill="#3C3489"/>
+          <rect x="195" y="80" width="290" height="150" rx="55" fill="#534AB7"/>
+          <rect x="195" y="80" width="290" height="60" rx="55" fill="#7F77DD" opacity="0.35"/>
+          <rect x="178" y="115" width="22" height="50" rx="11" fill="#3C3489"/>
+          <rect x="480" y="115" width="22" height="50" rx="11" fill="#3C3489"/>
+          <circle cx="189" cy="108" r="14" fill="#AFA9EC"/>
+          <circle cx="491" cy="108" r="14" fill="#AFA9EC"/>
+          <circle cx="189" cy="108" r="7" fill="#EEEDFE"/>
+          <circle cx="491" cy="108" r="7" fill="#EEEDFE"/>
+          <rect x="218" y="100" width="244" height="110" rx="36" fill="#26215C"/>
+          <path d="M254 100 Q340 90 426 100" fill="none" stroke="#E24B4A" stroke-width="4" stroke-linecap="round"/>
+          <path d="M234 110 Q340 95 446 110" fill="none" stroke="#FAC775" stroke-width="3" stroke-linecap="round"/>
+          <path d="M220 122 Q340 103 460 122" fill="none" stroke="#5DCAA5" stroke-width="3" stroke-linecap="round"/>
+          <ellipse cx="288" cy="152" rx="38" ry="40" fill="#534AB7"/>
+          <ellipse cx="288" cy="152" rx="28" ry="30" fill="#1D9E75"/>
+          <ellipse cx="288" cy="152" rx="18" ry="20" fill="#0F6E56"/>
+          <circle cx="288" cy="152" r="9" fill="#26215C"/>
+          <circle cx="296" cy="144" r="6" fill="white" opacity="0.9"/>
+          <ellipse cx="392" cy="152" rx="38" ry="40" fill="#534AB7"/>
+          <ellipse cx="392" cy="152" rx="28" ry="30" fill="#E24B4A"/>
+          <ellipse cx="392" cy="152" rx="18" ry="20" fill="#993C1D"/>
+          <circle cx="392" cy="152" r="9" fill="#26215C"/>
+          <circle cx="400" cy="144" r="6" fill="white" opacity="0.9"/>
+          <path d="M316 185 Q340 205 364 185" fill="none" stroke="#9FE1CB" stroke-width="4" stroke-linecap="round"/>
+          <ellipse cx="238" cy="178" rx="16" ry="10" fill="#D4537E" opacity="0.4"/>
+          <ellipse cx="442" cy="178" rx="16" ry="10" fill="#D4537E" opacity="0.4"/>
+        </svg>
+        <div class="chat-bubble">
+          <strong>Welke campagne presteert het best?</strong><br>
+          <small>Vandaag, 14:32</small>
+        </div>
+        <div class="chat-bubble" style="border-radius:4px 16px 16px 16px;background:#f0f0ff;margin-top:8px;">
+          📊 <strong>Google Ads analyse</strong><br>
+          Campagne "B2B Tanks Q1" → 47 leads, €8,40 CPA — beste ROAS van alle campagnes.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div><div class="stat-num">2 min</div><div class="stat-label">Setup tijd</div></div>
+    <div><div class="stat-num">10x</div><div class="stat-label">Sneller dan handmatig</div></div>
+    <div><div class="stat-num">200+</div><div class="stat-label">Tevreden gebruikers</div></div>
+    <div><div class="stat-num">24/7</div><div class="stat-label">Beschikbaar</div></div>
+  </div>
+</div>
+
+<!-- HOE HET WERKT -->
+<section id="how" class="section">
+  <div class="section-label">Hoe het werkt</div>
+  <h2>In 3 stappen klaar</h2>
+  <p class="section-sub">Geen technische kennis nodig. Verbind je accounts en begin meteen vragen te stellen.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-icon">🔗</div>
+      <h3>Verbind je accounts</h3>
+      <p>Log in met Google en kies je GA4 property en Search Console site. Klaar in 60 seconden.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-icon">💬</div>
+      <h3>Stel je vraag</h3>
+      <p>Typ in gewone taal wat je wilt weten. "Welke campagne presteert het best dit kwartaal?"</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-icon">📊</div>
+      <h3>Ontvang direct inzicht</h3>
+      <p>Insightly haalt live data op, analyseert het en geeft je concrete aanbevelingen. Geen exports nodig.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" style="background:var(--purple-50);padding:80px 0;">
+  <div class="section">
+    <div class="section-label">Mogelijkheden</div>
+    <h2>Alles wat je analist doet, maar sneller</h2>
+    <p class="section-sub">Insightly duikt automatisch in GA4 en Search Console en doet alle filters, dimensies en analyses voor je.</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#E1F5EE;">📈</div>
+        <div>
+          <h3>Traffic & kanalen</h3>
+          <p>Vergelijk organisch, paid, direct en social. Zie welk kanaal de meeste waardevolle bezoekers brengt.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#FAECE7;">🎯</div>
+        <div>
+          <h3>Conversie analyse</h3>
+          <p>Welke campagne heeft de hoogste ROAS? Op welke pagina haken bezoekers af? Insightly zoekt het zelf uit.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#EEEDFE;">🔍</div>
+        <div>
+          <h3>SEO & Search Console</h3>
+          <p>Quick wins op positie 4-10, CTR-analyse, Core Web Vitals en positievergelijking over periodes.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#FAEEDA;">🤖</div>
+        <div>
+          <h3>AI-gegenereerd advies</h3>
+          <p>Niet alleen cijfers, maar concrete acties. "Verhoog je budget op campagne X, CTR is 3x hoger dan gemiddeld."</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#E1F5EE;">📅</div>
+        <div>
+          <h3>Periode vergelijkingen</h3>
+          <p>Vergelijk januari 2025 met januari 2026, of YTD. Insightly begrijpt elke datumnotatie.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#FCEBEB;">📧</div>
+        <div>
+          <h3>Wekelijkse digest</h3>
+          <p>Ontvang elke maandag automatisch een samenvatting van je belangrijkste metrics in je inbox.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHAT DEMO -->
+<section class="chat-demo-section">
+  <div class="chat-demo-inner">
+    <div class="chat-demo-text">
+      <div class="section-label" style="color:#9FE1CB;">Live voorbeeld</div>
+      <h2>Zie hoe het werkt</h2>
+      <p>Insightly haalt zelf de data op, bouwt de juiste filters en geeft je een direct antwoord — inclusief bronvermelding.</p>
+      <a href="https://insightly-ai.up.railway.app" class="btn-primary" style="display:inline-flex;">
+        Probeer het zelf
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L14 8L8 14M2 8H14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+    <div class="chat-window">
+      <div class="chat-header">
+        <div class="chat-dot" style="background:#E24B4A;"></div>
+        <div class="chat-dot" style="background:#FAC775;"></div>
+        <div class="chat-dot" style="background:#5DCAA5;"></div>
+        <span style="margin-left:8px;">Insightly AI</span>
+      </div>
+      <div class="chat-messages">
+        <div class="msg-user">Welke Google Ads campagne presteert het best dit kwartaal?</div>
+        <div class="msg-bot">
+          <strong>Campagne analyse Q1 2026</strong><br><br>
+          <div class="metric"><span>B2B Industrial Tanks</span><span style="color:#9FE1CB;">47 leads ★</span></div>
+          <div class="metric"><span>RVS Configurator</span><span>23 leads</span></div>
+          <div class="metric"><span>Pressure Vessels EU</span><span>18 leads</span></div>
+          <br>
+          <strong>B2B Industrial Tanks</strong> is veruit de beste campagne: CPA €8,40 vs gemiddeld €24,70. Engagementrate 68% — bezoekers zijn zeer betrokken.<br><br>
+          Aanbeveling: verhoog budget met 30% en kopieer de landingspagina-aanpak naar andere campagnes.
+          <div class="source-badge">📊 GA4 · Paid Search · 1 jan – 1 mei 2026</div>
+        </div>
+        <div class="msg-user">En hoe zit dat voor Search Console?</div>
+        <div class="msg-bot">
+          <strong>Top zoektermen Q1 2026</strong><br><br>
+          <div class="metric"><span>api 650 tank</span><span style="color:#9FE1CB;">728 clicks</span></div>
+          <div class="metric"><span>rvs mixing tank</span><span>312 clicks</span></div>
+          <div class="metric"><span>pressure vessel manufacturer</span><span>241 clicks</span></div>
+          <div class="source-badge">🔍 Search Console · gpi-tanks.com · Q1 2026</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="section">
+  <div class="section-label">Prijzen</div>
+  <h2>Eenvoudige, eerlijke prijzen</h2>
+  <p class="section-sub">Geen verrassingen. Kies het plan dat bij jou past en upgrade wanneer je wilt.</p>
+
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="plan-name">Starter</div>
+      <div class="plan-price">€29<span>/maand</span></div>
+      <div class="plan-desc">Perfect voor freelancers en kleine bedrijven</div>
+      <ul class="plan-features">
+        <li><span class="check">✓</span> 30 vragen per maand</li>
+        <li><span class="check">✓</span> 1 GA4 property</li>
+        <li><span class="check">✓</span> Search Console koppeling</li>
+        <li><span class="check">✓</span> Chat geschiedenis</li>
+        <li><span class="check">✓</span> Email digest</li>
+      </ul>
+      <a href="https://insightly-ai.up.railway.app" class="plan-btn plan-btn-outline">Start gratis trial</a>
+    </div>
+
+    <div class="pricing-card featured">
+      <div class="popular-badge">Meest populair</div>
+      <div class="plan-name">Growth</div>
+      <div class="plan-price">€79<span>/maand</span></div>
+      <div class="plan-desc">Voor marketeers die serieus aan de slag gaan</div>
+      <ul class="plan-features">
+        <li><span class="check">✓</span> 200 vragen per maand</li>
+        <li><span class="check">✓</span> 5 GA4 properties</li>
+        <li><span class="check">✓</span> Search Console koppeling</li>
+        <li><span class="check">✓</span> Benchmark vergelijking</li>
+        <li><span class="check">✓</span> PDF rapport export</li>
+        <li><span class="check">✓</span> Prioriteit support</li>
+      </ul>
+      <a href="https://insightly-ai.up.railway.app" class="plan-btn plan-btn-fill">Start nu</a>
+    </div>
+
+    <div class="pricing-card">
+      <div class="plan-name">Agency</div>
+      <div class="plan-price">€199<span>/maand</span></div>
+      <div class="plan-desc">Voor bureaus met meerdere klanten</div>
+      <ul class="plan-features">
+        <li><span class="check">✓</span> Onbeperkte vragen</li>
+        <li><span class="check">✓</span> Onbeperkte properties</li>
+        <li><span class="check">✓</span> Multi-client dashboard</li>
+        <li><span class="check">✓</span> White-label mogelijk</li>
+        <li><span class="check">✓</span> Dedicated support</li>
+        <li><span class="check">✓</span> API toegang</li>
+      </ul>
+      <a href="mailto:info@insightly-ai.app" class="plan-btn plan-btn-outline">Neem contact op</a>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section style="background:var(--purple-50);padding:80px 0;">
+  <div class="section">
+    <div class="section-label">Wat gebruikers zeggen</div>
+    <h2>Geliefd door marketeers</h2>
+    <div class="testimonials-grid">
+      <div class="testimonial">
+        <div class="testimonial-stars">★★★★★</div>
+        <p>"Ik heb eindelijk een tool die gewoon antwoord geeft in plaats van dashboards te tonen die ik toch niet begrijp."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar" style="background:#534AB7;">MK</div>
+          <div><div class="author-name">Marieke K.</div><div class="author-role">Marketing Manager, B2B</div></div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="testimonial-stars">★★★★★</div>
+        <p>"Setup in 2 minuten. Eerste vraag gesteld, direct een inzicht dat me 3 uur handmatig werk had gekost."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar" style="background:#1D9E75;">RV</div>
+          <div><div class="author-name">Ruben V.</div><div class="author-role">Digital Marketeer</div></div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="testimonial-stars">★★★★★</div>
+        <p>"Onze klanten zijn onder de indruk van hoe snel we nu rapporten kunnen leveren. Game changer voor ons bureau."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar" style="background:#D85A30;">SP</div>
+          <div><div class="author-name">Sara P.</div><div class="author-role">Agency Owner</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-inner">
+    <h2>Klaar om te beginnen?</h2>
+    <p>Verbind je GA4 account en stel je eerste vraag. Gratis, geen creditcard nodig.</p>
+    <a href="https://insightly-ai.up.railway.app" class="btn-white">Start gratis →</a>
+    <div class="cta-note">14 dagen gratis · Geen creditcard nodig · Opzeggen wanneer je wilt</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <div class="logo-icon">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+              <rect x="2" y="12" width="4" height="8" rx="1.5" fill="#FAC775"/>
+              <rect x="8" y="8" width="4" height="12" rx="1.5" fill="#E24B4A"/>
+              <rect x="14" y="4" width="4" height="16" rx="1.5" fill="#5DCAA5"/>
+            </svg>
+          </div>
+          <span style="font-weight:700;color:white;font-size:16px;">Insightly AI</span>
+        </div>
+        <p>De slimste GA4-analist voor marketeers die meer willen bereiken met minder tijd.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#pricing">Prijzen</a></li>
+          <li><a href="#how">Hoe het werkt</a></li>
+          <li><a href="#">Changelog</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Bedrijf</h4>
+        <ul>
+          <li><a href="#">Over ons</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Partners</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <ul>
+          <li><a href="#">Help center</a></li>
+          <li><a href="#">Privacy</a></li>
+          <li><a href="#">Voorwaarden</a></li>
+          <li><a href="mailto:info@insightly-ai.app">E-mail</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Insightly AI. Alle rechten voorbehouden.</span>
+      <span>Gebouwd met ❤️ voor marketeers</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
